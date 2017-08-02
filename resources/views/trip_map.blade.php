@@ -110,11 +110,11 @@
 
     <br /><br />
     <input type="button" disabled="disabled" value="Save Trip" />
-    <div class="width:100%">
-      <div id="panel" style="width: 30%; height: 400px;overflow:scroll; float: left;">
+    <div class="width:100%;position:relative;">
+      <div id="panel-dis" style="width: 30%; height: 400px;overflow:scroll; float: left;position:relative;">
         <p>Total Distance: <span id="total"></span></p>
       </div>
-      <div style="height:400px;width:1000px">
+      <div style="height:400px;width:50%;float:left;">
           <div id="map_canvas">
 
           </div>
@@ -300,36 +300,26 @@
                     destination: end,
                     travelMode: google.maps.TravelMode.DRIVING
                 };
-                distanceTime();
             }
+            var totaldistance=0;
             directionsService.route(request, function (response, status) {
                 if (status == google.maps.DirectionsStatus.OK) {
                     directionsDisplay.setDirections(response);
                     var route = response.routes[0];
+                    var summaryPanel = document.getElementById('panel-dis');
+                    summaryPanel.innerHTML = "";
+                    for (var i = 0; i < route.legs.length; i++) {
+                        var routeSegment = i + 1;
+                        summaryPanel.innerHTML += '<b>Route Segment: ' + routeSegment + '</b><br>';
+                        summaryPanel.innerHTML += route.legs[i].start_address + ' to ';
+                        summaryPanel.innerHTML += route.legs[i].end_address + '<br>';
+                        summaryPanel.innerHTML += route.legs[i].distance.text + '<br><br>';
+                         totaldistance = totaldistance + route.legs[i].distance.text ;
+
+                      }
                 }
             });
         }
-        function distanceTime(){
-          if (all_pts.length>0) {
-            for (i  = 0; i < all_pts.length; i++) {
-              var latlng1 = new google.maps.LatLng(all_pts[i].geometry.location.lat, all_pts[i].geometry.location.lat);
-              if (google.maps.geometry.spherical.computeDistanceBetween(latlng1,map.getCenter()) < 30000) {
-                drivermarker=new google.maps.Marker({position:latlng1});
-                drivermarker.setMap(map);
-                var infowindow = new google.maps.InfoWindow();
-                google.maps.event.addListener(drivermarker, 'click', (function(marker, i) {
-                  return function() {
-                    infowindow.setContent(all_pts[i]);
-                    infowindow.open(map, drivermarker);
-                  }
-                })(drivermarker, i));
-                bounds.extend(latlng1);
-              }
-            }
-          }
-          bounds.extend(latlng1);
-        }
-          map.fitBounds(bounds);
     </script>
   </body>
 
