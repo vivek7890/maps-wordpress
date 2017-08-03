@@ -82,6 +82,10 @@
                   .OrderingField div.Commands {
                       width: 60px;
                   }
+                  .disabled{
+                    opacity: 0.65;
+                    cursor: not-allowed;
+                  }
 
               /*button {
               width: 60px;
@@ -99,19 +103,21 @@
     <br /><br />
     <label>Source</label>
     <input type="text" value="" name="source" id="source">
+    {{csrf_field()}}
     <br /><br />
     <label>Destination</label>
     <input type="text" value="" name="destination" id="destination">
     <br /><br />
     <button onclick="GenerateSourceDestinationPoint()" class="btn btn-primary" type="button" >Add Points</button>
     <div style="border: 1px solid -moz-nativehyperlinktext;"></div>
+    <input type="hidden" id="user_email" value={{ Auth::user()->email }} />
     <div id="FieldContainer">
     </div>
 
     <br /><br />
-    <input type="button" disabled="disabled" value="Save Trip" />
+    <input type="button" id="trip_btn" class="disabled" value="Save Trip" />
     <div class="width:100%">
-      <div id="panel" style="width: 30%; height: 400px;overflow:scroll; float: left;">
+      <div id="panel-dis" style="width: 30%; height: 400px;overflow:scroll; float: left;">
         <p>Total Distance: <span id="total"></span></p>
       </div>
       <div style="height:400px;width:1000px">
@@ -265,13 +271,19 @@
             }
             calcRoute();
         }
-
            function calcRoute() {
             var start = document.getElementById('source').value;
             var end = document.getElementById('destination').value;
             var waypts = [];
             var request = null;
-
+            if (start!='' && end!='') {
+              document.getElementById('trip_btn').disabled=false;
+              document.getElementById("trip_btn").classList.remove('disabled');
+            }
+            else {
+              document.getElementById('trip_btn').disabled=true;
+              document.getElementById("trip_btn").classList.add('disabled');
+            }
             if (v.length != 0) {
                 all_pts=[];
                 all_pts.push(start);
@@ -300,36 +312,43 @@
                     destination: end,
                     travelMode: google.maps.TravelMode.DRIVING
                 };
-                distanceTime();
             }
+            var totaldistance=0;
             directionsService.route(request, function (response, status) {
                 if (status == google.maps.DirectionsStatus.OK) {
                     directionsDisplay.setDirections(response);
                     var route = response.routes[0];
+                    var summaryPanel = document.getElementById('panel-dis');
+                    summaryPanel.innerHTML = "";
+                    for (var i = 0; i < route.legs.length; i++) {
+                        var routeSegment = i + 1;
+                        summaryPanel.innerHTML += '<b>Route Segment: ' + routeSegment + '</b><br>';
+                        summaryPanel.innerHTML += route.legs[i].start_address + ' to ';
+                        summaryPanel.innerHTML += route.legs[i].end_address + '<br>';
+                        summaryPanel.innerHTML += route.legs[i].distance.text + '<br><br>';
+                         totaldistance = totaldistance + route.legs[i].distance.text ;
+
+                      }
                 }
             });
         }
-        function distanceTime(){
-          if (all_pts.length>0) {
-            for (i  = 0; i < all_pts.length; i++) {
-              var latlng1 = new google.maps.LatLng(all_pts[i].geometry.location.lat, all_pts[i].geometry.location.lat);
-              if (google.maps.geometry.spherical.computeDistanceBetween(latlng1,map.getCenter()) < 30000) {
-                drivermarker=new google.maps.Marker({position:latlng1});
-                drivermarker.setMap(map);
-                var infowindow = new google.maps.InfoWindow();
-                google.maps.event.addListener(drivermarker, 'click', (function(marker, i) {
-                  return function() {
-                    infowindow.setContent(all_pts[i]);
-                    infowindow.open(map, drivermarker);
-                  }
-                })(drivermarker, i));
-                bounds.extend(latlng1);
-              }
-            }
-          }
-          bounds.extend(latlng1);
-        }
-          map.fitBounds(bounds);
+        //var disabledorenabled=document.getElementById('trip_btn').getAttribute("class");
+        $(document).on('click', '#trip_btn', function(){
+               $.ajax({
+                       type: 'post',
+                       url: '/user/trip_map/send',
+                       data: {
+                         '_token':$('input[name=_token]').val(),
+                         'user_email':$('#user_email').val(),
+                         'waypts':all_pts,
+                     },
+                       success: function(data)
+                       {
+                            console.log(data);
+                       },
+                       dataType: "json"
+                   });
+            });
     </script>
   </body>
 
