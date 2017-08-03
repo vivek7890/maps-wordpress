@@ -120,7 +120,7 @@
       <div id="panel-dis" style="width: 30%; height: 400px;overflow:scroll; float: left;">
         <p>Total Distance: <span id="total"></span></p>
       </div>
-      <div style="height:400px;width:1000px">
+      <div style="height:400px;width:50%;float:left;">
           <div id="map_canvas">
 
           </div>
@@ -332,7 +332,6 @@
                 }
             });
         }
-        //var disabledorenabled=document.getElementById('trip_btn').getAttribute("class");
         $(document).on('click', '#trip_btn', function(){
                $.ajax({
                        type: 'post',
