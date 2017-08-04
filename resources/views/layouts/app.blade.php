@@ -12,6 +12,7 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    {!! Mapper::renderJavascript() !!}
 </head>
 <body>
     <div id="app">

@@ -30,7 +30,8 @@ Route::get('/trip_map', function(){
   return view('/trip_map');
 });
 Route::post('/trip_map/send','tripController@create');
-
+Route::get('/trip_map/get','tripController@index');
+Route::get('/trip_map/get/details/{id}','tripController@show');
 });
 Route::post('/chat/send', 'HomeController@sendmessage');
 Route::post('/chat/get', 'HomeController@getmessage');

@@ -116,6 +116,9 @@
 
     <br /><br />
     <input type="button" id="trip_btn" class="disabled" value="Save Trip" />
+    @if (Session::has('message'))
+      <div class="alert alert-info">{{ Session::get('message') }}</div>
+    @endif
     <div class="width:100%">
       <div id="panel-dis" style="width: 30%; height: 400px;overflow:scroll; float: left;">
         <p>Total Distance: <span id="total"></span></p>

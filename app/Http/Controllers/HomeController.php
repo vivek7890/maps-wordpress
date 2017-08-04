@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Messages;
 use App\User;
+use App\Trips;
 
 class HomeController extends Controller
 {
