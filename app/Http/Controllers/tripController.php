@@ -18,18 +18,8 @@ class tripController extends Controller
     public function index()
     {
       $trips=Trips::where('user_email',\Auth()->user()->email)->get(['id','trip_name']);
-      if (Session::has('trip_details')) {
-        $source=Session::get('source');
-        $destination=Session::get('destination');
-        $waypoints=Session::get('waypts');
-
         Mapper::map(0, 0, ['eventAfterLoad' => 'addRoute(map_0);']);
         return view('all_trips',['trips'=>$trips]);
-      }
-      else {
-        Mapper::map(0, 0, ['locate' => true]);
-        return view('all_trips',['trips'=>$trips]);
-      }
         //echo($trips[0]);
 
     }
@@ -53,10 +43,9 @@ class tripController extends Controller
         $trip->trip_name=$request->waypts[0]." "."To"." ".$request->waypts[1];
         $trip->start_location=$request->waypts[0];
         $trip->end_location=$request->waypts[1];
-        $trip->waypoints=((count($waypoints)==1)?$waypoints[0]:serialize($waypoints));
+        $trip->waypoints=(serialize($waypoints));
         $trip->save();
-        Session::flash('message', "Trip Saved");
-        return Redirect::back();
+        return "success";
     }
 
     /**
@@ -91,10 +80,8 @@ class tripController extends Controller
         Session::flash('trip_details',$trip_details);
         Session::flash('source',$source);
         Session::flash('destination',$destination);
-        $all_points=collect($all_pts);
-        Session::flash('waypts',$all_points);
-        //echo $all_points;
-        return redirect()->back()->with(compact($source),compact($destination),compact($waypoints));
+        Session::flash('waypts',$all_pts);
+        return redirect("/user/trip_map/get");
     }
 
     /**

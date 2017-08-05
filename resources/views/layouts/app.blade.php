@@ -14,7 +14,7 @@
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     {!! Mapper::renderJavascript() !!}
 </head>
-<body>
+<body {{ Session::has('waypts') ? Session::has('waypts') : '' }}>
     <div id="app">
         <nav class="navbar navbar-default navbar-static-top">
             <div class="container">

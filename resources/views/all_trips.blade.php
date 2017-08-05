@@ -13,28 +13,30 @@
         <div class="col-md-8">
             <div id="map" style="width: 100%; height: 400px; float: left;">{!!  Mapper::render() !!}</div>
         </div>
-
+          
         <div id="map_data">
-          @if(Session::get('waypts'))
-            @forEach(Session::get('waypts') as $pts)
-              {{$pts}}
-            @endforeach
-          @endif
+
         </div>
     </div>
 </div>
 <script type="text/javascript">
 
-            function addRoute(map,source,destination,waypoints) {
+            function addRoute(map) {
                 var directionsService = new google.maps.DirectionsService();
                 var directionsDisplay = new google.maps.DirectionsRenderer();
                 directionsDisplay.setMap(map);
+                //var waypts=document.getElementById('waypts').value;
                 //directionsDisplay.setPanel(document.getElementById('panel'));
 
                 var request = {
                     origin: '{{Session::get('source')}}',
                     destination: '{{Session::get('destination')}}',
-                    waypoints: $waypoints,
+                    waypoints: [
+                      {
+                        location:'{{Session::get('waypts')[0]}}',
+                        stopover:true
+                      }
+                    ],
                     optimizeWaypoints: true,
                     travelMode: google.maps.DirectionsTravelMode.DRIVING
                 };
